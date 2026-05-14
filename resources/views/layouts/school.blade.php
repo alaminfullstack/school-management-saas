@@ -834,6 +834,41 @@
             .main-scroll {
                 transition: all .35s cubic-bezier(.4, 0, .2, 1);
             }
+
+           
+
+            #profileMenu {
+                display: none;
+                position: absolute;
+                right: 0;
+                top: 100%;
+                background: #ffffff;
+                border: 1px solid #e5e7eb;
+                border-radius: 6px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+                min-width: 200px;
+                z-index: 1000;
+            }
+
+             /* Profile Dropdown */
+            #profileMenu.show {
+                display: block !important;
+            }
+
+            #profileBtn {
+                cursor: pointer;
+            }
+
+            /* Password Modal Styles */
+            .toggle-password {
+                cursor: pointer;
+                color: #94a3b8;
+                font-size: 11px;
+                position: absolute;
+                right: 10px;
+                top: 50%;
+                transform: translateY(-50%);
+            }
         }
     </style>
 
@@ -1504,27 +1539,39 @@
                     </button> --}}
 
                     {{-- Profile Toggle --}}
-                    <button data-bs-toggle="modal" data-bs-target="#editProfileModal"
-                        class="w-8 h-8 flex items-center justify-center rounded-full border border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-slate-300 transition-all"
-                        title="{{ auth()->user()->school_name }}">
+                    <div class="relative">
+                        <button id="profileBtn"
+                            class="w-8 h-8 flex items-center justify-center rounded-full border border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-slate-300 transition-all"
+                            title="{{ auth()->user()->school_name }}">
 
-                        {{-- Profile Icon (SVG) --}}
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
-                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                            stroke-linejoin="round" class="text-slate-600">
-                            <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="12" cy="7" r="4"></circle>
-                        </svg>
+                            {{-- Profile Icon (SVG) --}}
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="text-slate-600">
+                                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
 
-                    </button>
+                        </button>
 
-                    {{-- Logout Toggle --}}
-                    <a href="#" id="logoutBtnTop"
-                        class="w-8 h-8 flex items-center justify-center rounded-full border border-slate-200 text-red-500 hover:bg-red-50 transition-colors"
-                        title="Logout" >
-                        {{-- <i class="fas fa-sign-out-alt"></i> --}}
-                        <i class="fas fa-light fa-power-off"></i>
-                    </a>
+                        <div id="profileMenu" class="show absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg py-2 z-50">
+                            <button type="button" class="w-full px-4 py-2 text-[12px] hover:bg-gray-100 text-left flex items-center gap-2" onclick="openProfileModal()" style="border: none; background: transparent; color: #334155; cursor: pointer;">
+                                <i class="fas fa-edit text-xs"></i>
+                                Edit Profile
+                            </button>
+                            <button type="button" class="w-full px-4 py-2 text-[12px] hover:bg-gray-100 text-left flex items-center gap-2" onclick="openPasswordModal()" style="border: none; background: transparent; color: #334155; cursor: pointer;">
+                                <i class="fas fa-lock text-xs"></i>
+                                Change Password
+                            </button>
+                            <hr class="my-1" style="margin-top: 4px; margin-bottom: 4px; border: none; border-top: 1px solid #e5e7eb;">
+                            <a href="#" id="logoutBtnTop"
+                                class="w-full px-4 py-2 text-[12px] hover:bg-red-50 text-left flex items-center gap-2 text-red-500"
+                                style="text-decoration: none;">
+                                <i class="fas fa-power-off text-xs"></i>
+                                Logout
+                            </a>
+                        </div>
+                    </div>
 
                 </div>
 
@@ -1663,6 +1710,75 @@
         </div>
     </div>
 
+    <!-- Password Change Modal -->
+    <div class="modal fade premium-modal" id="passwordModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered mx-auto" style="width: 85%; max-width: 500px;">
+            <div class="modal-content modal-content-sharp shadow-2xl overflow-hidden flex flex-col border border-gray-100"
+                style="border-radius: 0; background: #fff;">
+
+                <div class="px-5 py-3 border-b flex justify-center items-center bg-white sticky top-0 z-10">
+                    <h3
+                        class="text-gray-800 text-[13px] font-medium leading-tight text-center capitalize tracking-normal">
+                        Change Password
+                    </h3>
+                </div>
+
+                <form id="passwordChangeForm" class="flex flex-col overflow-hidden m-0">
+                    @csrf
+                    <div class="overflow-y-auto custom-scrollbar p-4 sm:p-6 flex-grow bg-gray-50/30">
+
+                        <div class="space-y-4">
+                            <div class="w-full">
+                                <label class="block text-[10px] capitalize tracking-normal text-gray-500 mb-1.5">Current Password</label>
+                                <div class="relative">
+                                    <input type="password" name="current_password" id="currentPassInput"
+                                        class="form-control w-full border border-gray-200 py-1.5 px-3 text-xs h-[32px]"
+                                        style="border-radius: 0;" required>
+                                    <i class="fas fa-eye toggle-password" data-target="currentPassInput" title="Toggle Password"></i>
+                                </div>
+                            </div>
+
+                            <div class="w-full">
+                                <label class="block text-[10px] capitalize tracking-normal text-gray-500 mb-1.5">New Password</label>
+                                <div class="relative">
+                                    <input type="password" name="new_password" id="newPassInput"
+                                        class="form-control w-full border border-gray-200 py-1.5 px-3 text-xs h-[32px]"
+                                        style="border-radius: 0;" required>
+                                    <i class="fas fa-eye toggle-password" data-target="newPassInput" title="Toggle Password"></i>
+                                </div>
+                                <small class="text-[9px] text-slate-400 mt-1 block">Min 8 chars, uppercase, lowercase, numbers & symbols</small>
+                            </div>
+
+                            <div class="w-full">
+                                <label class="block text-[10px] capitalize tracking-normal text-gray-500 mb-1.5">Confirm Password</label>
+                                <div class="relative">
+                                    <input type="password" name="new_password_confirmation" id="confirmNewPassInput"
+                                        class="form-control w-full border border-gray-200 py-1.5 px-3 text-xs h-[32px]"
+                                        style="border-radius: 0;" required>
+                                    <i class="fas fa-eye toggle-password" data-target="confirmNewPassInput" title="Toggle Password"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        class="px-4 sm:px-6 py-4 border-t border-gray-100 bg-white flex flex-row sm:justify-end gap-2 sticky bottom-0">
+                        <button type="button" data-bs-dismiss="modal"
+                            class="w-1/2 sm:w-auto sm:px-8 h-[32px] border border-gray-200 text-[10px] tracking-normal capitalize transition-all hover:bg-gray-50 flex items-center justify-center whitespace-nowrap"
+                            style="border-radius: 0; background: transparent; color: #64748b;">
+                            Cancel
+                        </button>
+                        <button type="submit" id="savePasswordBtn"
+                            class="w-1/2 sm:w-auto sm:px-12 h-[32px] border border-gray-200 text-[10px] tracking-normal capitalize flex items-center justify-center whitespace-nowrap"
+                            style="border-radius: 0; background: #2563eb; color: #ffffff;">
+                            <i class="fas fa-check mr-1"></i> Change
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <div id="globalModalBackdrop" class="global-modal-backdrop"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -1673,6 +1789,53 @@
                                                                                                                                                                                                                                                                 --------------------------------*/
         // We fetch these inside functions or check for null to prevent crashes
         const getEl = (id) => document.getElementById(id);
+
+        /* --- Open Profile Modal --- */
+        function openProfileModal() {
+            const modal = new bootstrap.Modal(document.getElementById('editProfileModal'));
+            modal.show();
+        }
+
+        /* --- Open Password Modal --- */
+        function openPasswordModal() {
+            const modal = new bootstrap.Modal(document.getElementById('passwordModal'));
+            modal.show();
+        }
+
+        /* --- Profile Dropdown Toggle --- */
+        const profileBtn = document.getElementById('profileBtn');
+        const profileMenu = document.getElementById('profileMenu');
+
+        if (profileBtn && profileMenu) {
+            profileBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                profileMenu.classList.toggle('show');
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!profileBtn.contains(e.target) && !profileMenu.contains(e.target)) {
+                    profileMenu.classList.remove('show');
+                }
+            });
+        }
+
+        /* --- Password Eye Toggle --- */
+        document.querySelectorAll('.toggle-password').forEach(icon => {
+            icon.addEventListener('click', function() {
+                const input = document.getElementById(this.dataset.target);
+                if (input) {
+                    if (input.type === 'password') {
+                        input.type = 'text';
+                        this.classList.remove('fa-eye');
+                        this.classList.add('fa-eye-slash');
+                    } else {
+                        input.type = 'password';
+                        this.classList.remove('fa-eye-slash');
+                        this.classList.add('fa-eye');
+                    }
+                }
+            });
+        });
 
         /* -------------------------------
             IMAGE PREVIEW
@@ -1794,6 +1957,69 @@
                     });
                 } finally {
                     // Restore Button State
+                    btn.innerHTML = originalBtnText;
+                    btn.disabled = false;
+                }
+            });
+        }
+
+        /* --- Password Change Form --- */
+        const passwordChangeForm = getEl('passwordChangeForm');
+
+        if (passwordChangeForm) {
+            passwordChangeForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const btn = getEl('savePasswordBtn');
+                if (!btn) return;
+
+                const originalBtnText = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Changing...';
+                btn.disabled = true;
+
+                const formData = new FormData(passwordChangeForm);
+
+                try {
+                    const res = await fetch('/api/change-password', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        },
+                        body: formData
+                    });
+
+                    const data = await res.json();
+
+                    if (res.ok && data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: data.message || 'Password changed successfully!',
+                            toast: true,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 3000,
+                            timerProgressBar: true
+                        });
+                        passwordChangeForm.reset();
+                        const modal = bootstrap.Modal.getInstance(getEl('passwordModal'));
+                        if (modal) {
+                            modal.hide();
+                        }
+                    } else {
+                        let errorMsg = data.message || 'Password update failed.';
+                        if (data.errors) {
+                            errorMsg = Object.values(data.errors).flat().join('<br>');
+                        }
+                        throw new Error(errorMsg);
+                    }
+                } catch (error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        html: error.message || 'Could not reach server.'
+                    });
+                } finally {
                     btn.innerHTML = originalBtnText;
                     btn.disabled = false;
                 }

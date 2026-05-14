@@ -48,6 +48,7 @@ use App\Http\Controllers\Api\SchoolTeacherClassPermissionController;
 use App\Http\Controllers\Api\SchoolTeacherController;
 use App\Http\Controllers\Api\SmsPackageController;
 use App\Http\Controllers\Api\SubscriptionController;
+use App\Http\Controllers\Api\PasswordChangeController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -112,6 +113,9 @@ Route::get('/get-fees/{school_id}/{class_id}', [AdmissionController::class, 'get
 Route::middleware('auth:sanctum')->group(function () {
 
     Route::middleware(['web'])->post('/logout', [AuthController::class, 'logout']);
+
+    // === UNIFIED PASSWORD CHANGE (All Roles) ===
+    Route::post('/change-password', [PasswordChangeController::class, 'changePassword']);
 
     // --- ADMIN SECTION ---
 

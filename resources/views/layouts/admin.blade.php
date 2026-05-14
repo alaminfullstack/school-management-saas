@@ -433,6 +433,9 @@
                             <li><a href="javascript:void(0)" onclick="openProfileModal()"
                                     class="dropdown-item px-4 py-2 text-sm hover:bg-gray-100">Profile</a>
                             </li>
+                            <li><a href="javascript:void(0)" onclick="openPasswordModal()"
+                                    class="dropdown-item px-4 py-2 text-sm hover:bg-gray-100">Change Password</a>
+                            </li>
                             <li>
                                 <hr class="my-1">
                             </li>
@@ -571,6 +574,90 @@
         </div>
     </div>
 
+    <!-- Password Change Modal -->
+    <div class="modal fade premium-modal" id="passwordModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered mx-auto" style="width: 95%; max-width: 480px;">
+            <div class="modal-content modal-content-sharp shadow-2xl"
+                style="border-radius: 0; border: 1.5px solid #1e293b !important; background: #fff;">
+
+                <form id="passwordChangeForm" enctype="multipart/form-data">
+                    @csrf
+                    <div class="px-4 py-2 border-b border-gray-100 flex items-center justify-between bg-white">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-7 h-7 bg-slate-900 text-white flex-shrink-0 flex items-center justify-center">
+                                <i class="fas fa-lock text-md"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <h3 class="text-[11px] font-black text-gray-800 uppercase tracking-widest">Change Password</h3>
+                            </div>
+                        </div>
+                        <button type="button" class="text-gray-400 hover:text-gray-800 transition-colors shadow-none"
+                            data-bs-dismiss="modal">
+                            <i class="mdi mdi-close text-lg"></i>
+                        </button>
+                    </div>
+
+                    <div class="modal-body p-4">
+                        <div class="space-y-3">
+                            <div class="w-full">
+                                <label
+                                    class="text-[9px] font-black text-slate-500 uppercase mb-1 block tracking-widest">Current Password</label>
+                                <div class="position-relative">
+                                    <input type="password" name="current_password" id="currentPassInput" class="form-control"
+                                        style="border: 1.5px solid #cbd5e1 !important; height: 34px; padding: 0 10px; font-size: 12px; outline: none; border-radius: 0; display: block; width: 100%; box-sizing: border-box;"
+                                        required>
+                                    <i class="fas fa-eye toggle-password" data-target="currentPassInput"
+                                        style="position: absolute; right: 10px; top: 9px; cursor: pointer; color: #94a3b8; font-size: 11px;"></i>
+                                </div>
+                            </div>
+
+                            <div class="w-full">
+                                <label
+                                    class="text-[9px] font-black text-slate-500 uppercase mb-1 block tracking-widest">New Password</label>
+                                <div class="position-relative">
+                                    <input type="password" name="new_password" id="newPassInput" class="form-control"
+                                        style="border: 1.5px solid #cbd5e1 !important; height: 34px; padding: 0 10px; font-size: 12px; outline: none; border-radius: 0; display: block; width: 100%; box-sizing: border-box;"
+                                        required>
+                                    <i class="fas fa-eye toggle-password" data-target="newPassInput"
+                                        style="position: absolute; right: 10px; top: 9px; cursor: pointer; color: #94a3b8; font-size: 11px;"></i>
+                                </div>
+                                <small class="text-[9px] text-slate-400 mt-1 block">Min 8 characters, uppercase, lowercase, numbers & symbols</small>
+                            </div>
+
+                            <div class="w-full">
+                                <label
+                                    class="text-[9px] font-black text-slate-500 uppercase mb-1 block tracking-widest">Confirm Password</label>
+                                <div class="position-relative">
+                                    <input type="password" name="new_password_confirmation" id="confirmNewPassInput"
+                                        class="form-control"
+                                        style="border: 1.5px solid #cbd5e1 !important; height: 34px; padding: 0 10px; font-size: 12px; outline: none; border-radius: 0; display: block; width: 100%; box-sizing: border-box;"
+                                        required>
+                                    <i class="fas fa-eye toggle-password" data-target="confirmNewPassInput"
+                                        style="position: absolute; right: 10px; top: 9px; cursor: pointer; color: #94a3b8; font-size: 11px;"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        class="flex flex-col-reverse sm:flex-row items-center justify-end gap-2 border-t border-gray-100 p-3 bg-gray-50/50">
+                        <button type="button"
+                            class="w-full sm:w-auto px-4 py-2 text-[9px] font-black uppercase tracking-widest transition-all"
+                            style="border: 1.5px solid #64748b !important; background: transparent; color: #64748b; border-radius: 0;"
+                            data-bs-dismiss="modal">Cancel</button>
+
+                        <button type="submit" id="savePasswordBtn"
+                            class="w-full sm:w-auto px-6 py-2 text-[9px] font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-blue-700 transition-all shadow-md"
+                            style="border: 1.5px solid #2563eb !important; background: #2563eb; color: #ffffff; border-radius: 0;">
+                            <i class="mdi mdi-check-circle-outline text-xs"></i> Change Password
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <div id="globalModalBackdrop" class="global-modal-backdrop"></div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -640,6 +727,11 @@
             new bootstrap.Modal(document.getElementById('profileModal')).show();
         }
 
+        /* --- Password Change Modal Logic --- */
+        function openPasswordModal() {
+            new bootstrap.Modal(document.getElementById('passwordModal')).show();
+        }
+
         // Image Preview
         $('#profile_image').on('change', function() {
             const reader = new FileReader();
@@ -692,6 +784,59 @@
                 },
                 error: (err) => Swal.fire('Error', 'Update failed', 'error'),
                 complete: () => btn.prop('disabled', false).text('Save Changes')
+            });
+        });
+
+        // === PASSWORD CHANGE FORM HANDLER ===
+        $('#passwordChangeForm').on('submit', function(e) {
+            e.preventDefault();
+            const btn = $('#savePasswordBtn');
+            const originalText = btn.html();
+            btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Changing...');
+
+            $.ajax({
+                url: '/api/change-password',
+                method: 'POST',
+                data: {
+                    current_password: $('input[name="current_password"]').val(),
+                    new_password: $('input[name="new_password"]').val(),
+                    new_password_confirmation: $('input[name="new_password_confirmation"]').val(),
+                    _token: '{{ csrf_token() }}'
+                },
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
+                success: function(res) {
+                    if (res.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: res.message,
+                            toast: true,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 3000
+                        });
+                        document.getElementById('passwordChangeForm').reset();
+                        bootstrap.Modal.getInstance(document.getElementById('passwordModal')).hide();
+                    }
+                },
+                error: function(xhr) {
+                    const res = xhr.responseJSON;
+                    let errorMsg = res.message || 'Password change failed';
+                    if (res.errors) {
+                        errorMsg = Object.values(res.errors).flat().join('<br>');
+                    }
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        html: errorMsg
+                    });
+                },
+                complete: () => {
+                    btn.prop('disabled', false).html(originalText);
+                }
             });
         });
 

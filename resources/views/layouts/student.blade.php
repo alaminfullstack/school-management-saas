@@ -365,6 +365,7 @@
                     </button>
 
                     <ul id="profileMenu" class="dropdown-menu bg-white shadow-lg rounded-lg py-2 w-48 text-sm">
+                        <li><a href="#" onclick="openPasswordModal()" class="px-4 py-2 hover:bg-gray-100 block">Change Password</a></li>
                         <li><a href="#" class="px-4 py-2 hover:bg-gray-100 block">Profile</a></li>
                         <li><a href="#" class="px-4 py-2 hover:bg-gray-100 block">Settings</a></li>
                         <li>
@@ -384,6 +385,72 @@
 
     </div>
 
+    <div class="modal fade premium-modal" id="passwordModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered mx-auto" style="width: 95%; max-width: 480px;">
+            <div class="modal-content modal-content-sharp shadow-2xl"
+                style="border-radius: 0; border: 1.5px solid #1e293b !important; background: #fff;">
+
+                <form id="passwordChangeForm">
+                    @csrf
+                    <div class="px-4 py-2 border-b border-gray-100 flex items-center justify-between bg-white">
+                        <div class="flex items-center gap-3">
+                            <div class="w-7 h-7 bg-slate-900 text-white flex-shrink-0 flex items-center justify-center">
+                                <i class="fas fa-lock text-md"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <h3 class="text-[11px] font-black text-gray-800 uppercase tracking-widest">Change Password</h3>
+                            </div>
+                        </div>
+                        <button type="button" class="text-gray-400 hover:text-gray-800 transition-colors shadow-none"
+                            data-bs-dismiss="modal">
+                            <i class="mdi mdi-close text-lg"></i>
+                        </button>
+                    </div>
+
+                    <div class="modal-body p-4 space-y-3">
+                        <div class="w-full">
+                            <label class="text-[9px] font-black text-slate-500 uppercase mb-1 block tracking-widest">Current Password</label>
+                            <div class="relative">
+                                <input type="password" name="current_password" id="currentPassInput" class="form-control"
+                                    style="border: 1.5px solid #cbd5e1 !important; height: 34px; padding: 0 10px; font-size: 12px; outline: none; border-radius: 0; width: 100%; box-sizing: border-box;">
+                                <i class="fas fa-eye toggle-password" data-target="currentPassInput" style="position: absolute; right: 10px; top: 9px; cursor: pointer; color: #94a3b8; font-size: 11px;"></i>
+                            </div>
+                        </div>
+                        <div class="w-full">
+                            <label class="text-[9px] font-black text-slate-500 uppercase mb-1 block tracking-widest">New Password</label>
+                            <div class="relative">
+                                <input type="password" name="new_password" id="newPassInput" class="form-control"
+                                    style="border: 1.5px solid #cbd5e1 !important; height: 34px; padding: 0 10px; font-size: 12px; outline: none; border-radius: 0; width: 100%; box-sizing: border-box;">
+                                <i class="fas fa-eye toggle-password" data-target="newPassInput" style="position: absolute; right: 10px; top: 9px; cursor: pointer; color: #94a3b8; font-size: 11px;"></i>
+                            </div>
+                        </div>
+                        <div class="w-full">
+                            <label class="text-[9px] font-black text-slate-500 uppercase mb-1 block tracking-widest">Confirm Password</label>
+                            <div class="relative">
+                                <input type="password" name="new_password_confirmation" id="confirmNewPassInput" class="form-control"
+                                    style="border: 1.5px solid #cbd5e1 !important; height: 34px; padding: 0 10px; font-size: 12px; outline: none; border-radius: 0; width: 100%; box-sizing: border-box;">
+                                <i class="fas fa-eye toggle-password" data-target="confirmNewPassInput" style="position: absolute; right: 10px; top: 9px; cursor: pointer; color: #94a3b8; font-size: 11px;"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col-reverse sm:flex-row items-center justify-end gap-2 border-t border-gray-100 p-3 bg-gray-50/50">
+                        <button type="button"
+                            class="w-full sm:w-auto px-4 py-2 text-[9px] font-black uppercase tracking-widest transition-all"
+                            style="border: 1.5px solid #64748b !important; background: transparent; color: #64748b; border-radius: 0;"
+                            data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" id="savePasswordBtn"
+                            class="w-full sm:w-auto px-6 py-2 text-[9px] font-black uppercase tracking-widest flex items-center justify-center gap-2"
+                            style="border: 1.5px solid #2563eb !important; background: #2563eb; color: #ffffff; border-radius: 0;">
+                            <i class="fas fa-check-circle-outline text-xs"></i> Change Password
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         const sidebar = document.getElementById('sidebar')
         const hamburger = document.getElementById('hamburger')
@@ -391,6 +458,9 @@
         const pageTitle = document.getElementById('pageTitle')
         const menuNav = document.getElementById('menuNav')
         const logoutBtn = document.getElementById('logoutBtn')
+        const profileBtn = document.getElementById('profileBtn')
+        const profileMenu = document.getElementById('profileMenu')
+        const passwordChangeForm = document.getElementById('passwordChangeForm')
 
         /* Mobile toggle */
         hamburger.addEventListener('click', () => {
@@ -428,11 +498,89 @@
         window.addEventListener('DOMContentLoaded', highlightActiveMenu)
 
         /* Profile dropdown */
-        const profileBtn = document.getElementById('profileBtn')
-        const profileMenu = document.getElementById('profileMenu')
-        profileBtn.addEventListener('click', () => {
-            profileMenu.classList.toggle('show')
+        if (profileBtn && profileMenu) {
+            profileBtn.addEventListener('click', (e) => {
+                e.stopPropagation()
+                profileMenu.classList.toggle('show')
+            })
+
+            document.addEventListener('click', (e) => {
+                if (!profileBtn.contains(e.target) && !profileMenu.contains(e.target)) {
+                    profileMenu.classList.remove('show')
+                }
+            })
+        }
+
+        function openPasswordModal() {
+            new bootstrap.Modal(document.getElementById('passwordModal')).show();
+        }
+
+        document.querySelectorAll('.toggle-password').forEach(iconEl => {
+            iconEl.addEventListener('click', function() {
+                const input = document.getElementById(this.dataset.target)
+                if (!input) return
+                if (input.type === 'password') {
+                    input.type = 'text'
+                    this.classList.remove('fa-eye')
+                    this.classList.add('fa-eye-slash')
+                } else {
+                    input.type = 'password'
+                    this.classList.remove('fa-eye-slash')
+                    this.classList.add('fa-eye')
+                }
+            })
         })
+
+        if (passwordChangeForm) {
+            passwordChangeForm.addEventListener('submit', async (e) => {
+                e.preventDefault()
+                const btn = document.getElementById('savePasswordBtn')
+                const originalText = btn.innerHTML
+                btn.disabled = true
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Changing...'
+
+                try {
+                    const formData = new FormData(passwordChangeForm)
+                    const res = await fetch('/api/change-password', {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: formData
+                    })
+                    const data = await res.json()
+
+                    if (res.ok && data.success) {
+                        new bootstrap.Modal(document.getElementById('passwordModal')).hide()
+                        passwordChangeForm.reset()
+                        Swal.fire({
+                            icon: 'success',
+                            title: data.message || 'Password updated',
+                            toast: true,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 2500
+                        })
+                    } else {
+                        let errorMsg = data.message || 'Password update failed'
+                        if (data.errors) {
+                            errorMsg = Object.values(data.errors).flat().join('<br>')
+                        }
+                        throw new Error(errorMsg)
+                    }
+                } catch (error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        html: error.message || 'Unable to update password.'
+                    })
+                } finally {
+                    btn.disabled = false
+                    btn.innerHTML = originalText
+                }
+            })
+        }
 
         /* Logout */
         logoutBtn.addEventListener('click', logoutUser)
