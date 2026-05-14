@@ -662,11 +662,16 @@
      */
     function fetchFilteredExams(isFilter = false) {
         const prefix = isFilter ? 'f_' : 'm_';
+        const classEl = document.getElementById(`${prefix}class`);
+        const groupEl = document.getElementById(`${prefix}group`);
+        const sectionEl = document.getElementById(`${prefix}section`);
+        const sessionEl = document.getElementById(`${prefix}session`);
+        
         const params = {
-            class_name: document.getElementById(`${prefix}class`).value,
-            group_name: document.getElementById(`${prefix}group`).value,
-            section_name: document.getElementById(`${prefix}section`).value,
-            session_name: document.getElementById(`${prefix}session`).value,
+            class_name: classEl.value,
+            group_name: groupEl.value,
+            section_name: sectionEl.value,
+            session_name: sessionEl.value,
         };
 
         axios.get('/api/get-school-exams', { params }).then(res => {

@@ -464,8 +464,18 @@
         function handleSessionChange() {
             const sess = document.getElementById('c_session').value;
             const cls = document.getElementById('c_class').value;
+            const grp = document.getElementById('c_group').value;
+            const sec = document.getElementById('c_section').value;
             if (!sess || !cls) return;
-            axios.get(`/api/get-school-exams?session_name=${sess}&class_name=${cls}`).then(res => {
+            
+            const params = {
+                session_name: sess,
+                class_name: cls
+            };
+            if (grp) params.group_name = grp;
+            if (sec) params.section_name = sec;
+            
+            axios.get('/api/get-school-exams', { params }).then(res => {
                 const el = document.getElementById('c_exam');
                 el.innerHTML = '<option value="">Select Exam</option>';
                 res.data.data.forEach(item => el.innerHTML +=

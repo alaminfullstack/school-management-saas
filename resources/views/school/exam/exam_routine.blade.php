@@ -801,9 +801,24 @@
         }
 
         async function loadFilterExams() {
-            const className = document.getElementById('f_class').value;
-            const sessionName = document.getElementById('f_session').value;
-            const res = await axios.get(`/api/get-school-exams?class_name=${className}&session_name=${sessionName}`);
+            const classEl = document.getElementById('f_class');
+            const sessionEl = document.getElementById('f_session');
+            const groupEl = document.getElementById('f_group');
+            const sectionEl = document.getElementById('f_section');
+            
+            const className = classEl.options[classEl.selectedIndex].value;
+            const sessionName = sessionEl.options[sessionEl.selectedIndex].value;
+            const groupName = groupEl.options[groupEl.selectedIndex].value;
+            const sectionName = sectionEl.options[sectionEl.selectedIndex].value;
+            
+            const res = await axios.get('/api/get-school-exams', {
+                params: {
+                    class_name: className,
+                    session_name: sessionName,
+                    group_name: groupName,
+                    section_name: sectionName
+                }
+            });
             fillDropdown('f_exam', res.data.data, 'exam_name', 'Exam', true);
         }
 

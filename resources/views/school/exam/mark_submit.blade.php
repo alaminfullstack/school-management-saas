@@ -714,12 +714,16 @@
             }).then(res => fillOptions('m_subject', res.data.data, 'subject_name', 'f_subject'));
         }
 
-        function refreshExams(className, sessionName = null) {
+        function refreshExams(className, groupName = null, sectionName = null, sessionName = null) {
+            const params = {
+                class_name: className
+            };
+            if (groupName) params.group_name = groupName;
+            if (sectionName) params.section_name = sectionName;
+            if (sessionName) params.session_name = sessionName;
+            
             axios.get('/api/get-school-exams', {
-                params: {
-                    class_name: className,
-                    session_name: sessionName
-                }
+                params
             }).then(res => fillOptions('m_exam', res.data.data, 'exam_name', 'f_exam'));
         }
 
