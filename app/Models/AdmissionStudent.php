@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
 
 class AdmissionStudent extends Model
 {
@@ -63,20 +62,45 @@ class AdmissionStudent extends Model
     protected static function booted()
     {
         static::creating(function ($model) {
-            // Generate a sequential student ID number starting from 00000001
-            $lastStudent = static::orderBy('id', 'desc')->first();
+            // Get the school's id_number (5-digit school code)
+            $school = \App\Models\School::where('user_id', $model->school_id)->first();
             
-            if ($lastStudent && $lastStudent->student_id_number) {
-                // Extract the numeric part and increment
-                $lastNumber = (int)$lastStudent->student_id_number;
-                $newNumber = $lastNumber + 1;
+            if (!$school || !$school->id_number) {
+                // If school doesn't have an id_number, generate one starting from 00001
+                $lastSchool = \App\Models\School::orderBy('id', 'desc')->first();
+                if ($lastSchool && $lastSchool->id_number && is_numeric($lastSchool->id_number)) {
+                    $lastCode = (int)$lastSchool->id_number;
+                    $newCode = $lastCode + 1;
+                } else {
+                    $newCode = 1;
+                }
+                $schoolIdCode = str_pad($newCode, 5, '0', STR_PAD_LEFT);
+                
+                // Update the school with the new code
+                if ($school) {
+                    $school->id_number = $schoolIdCode;
+                    $school->save();
+                }
             } else {
-                // Start from 1 if no records exist
-                $newNumber = 1;
+                $schoolIdCode = $school->id_number;
             }
             
-            // Format to 8 digits with leading zeros
-            $model->student_id_number = str_pad($newNumber, 8, '0', STR_PAD_LEFT);
+            // Get the last serial number for this specific school
+            $lastStudent = static::where('school_id', $model->school_id)
+                ->orderBy('id', 'desc')
+                ->first();
+            
+            if ($lastStudent && $lastStudent->student_id_number && strlen($lastStudent->student_id_number) === 11) {
+                // Extract the last 6 digits (serial part) and increment
+                $lastSerial = substr($lastStudent->student_id_number, -6);
+                $newSerial = (int)$lastSerial + 1;
+            } else {
+                // Start from 1 if no records exist for this school or ID format is different
+                $newSerial = 1;
+            }
+            
+            // Combine: 5-digit school code + 6-digit serial = 11-digit student ID
+            $model->student_id_number = $schoolIdCode . str_pad($newSerial, 6, '0', STR_PAD_LEFT);
         });
 
         static::created(function ($model) {
